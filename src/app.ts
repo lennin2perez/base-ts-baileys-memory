@@ -6,40 +6,56 @@ import { BaileysProvider as Provider } from '@builderbot/provider-baileys'
 
 const PORT = process.env.PORT ?? 3008
 
-const flowToA = addKeyword<Provider, Database>('inf').addAnswer( 
-    ['📄 Puedes escribirnos de lunes a viernes de 9:00 a. m. a 6:00 p. m. por este chat de la tienda, por correo electrónico a soporteonline@touchechile.cl y WhatsApp al +56 22289500. Los casos del fin de semana y festivos se atenderán a partir del siguiente día hábil en orden de llegada. \n', 
+const flowDefault = addKeyword<Provider, Database>(['chao', 'CHAO', 'Chao', 'Hasta luego', 'hasta luego', 'HASTA LUEGO']).addAnswer("Envíanos un mensaje directo si tienes alguna pregunta. Nos complace ayudarte.")
+
+const flowToA = addKeyword<Provider, Database>(['inf', 'INF', 'Inf'])
+.addAnswer( 
+    ['📄 Puedes escribirnos de lunes a viernes de 9:00 a. m. a 6:00 p. m. por este chat de la tienda\n',
+    'por correo electrónico a soporteonline@touchechile.cl y WhatsApp al +56 22289500.\n', 
+    'Los casos del fin de semana y festivos se atenderán a partir del siguiente día hábil en orden de llegada. \n', 
+    
     'Regístrate para recibir las últimas noticias y actualización de catalogos \n',
-    'Recibe promociones y actualizaciones especiales por correo electrónico. Puedes darte de baja en cualquier momento. *si* '].join(
+
+    'Recibe promociones y actualizaciones especiales por correo electrónico. Puedes darte de baja en cualquier momento. \n',
+    'indica la palaba *si*, para realizar el registro '].join(
         '\n'
     ),
-    { capture: true },
+    { delay: 300, capture: true },
+    
     async (ctx, { gotoFlow, flowDynamic }) => {
-        if (ctx.body.toLocaleLowerCase().includes('si')) {
-            return gotoFlow(registerFlow)
+        //if (ctx.body.toLocaleLowerCase().includes('yes')) {
+        //if (!['si', 'Si', 'SI', 'S', 's'].some(word => ctx.body.toLowerCase().includes(word))) {
+        if (['si', 'Si', 'SI', 'S', 's'].some(word => ctx.body.toLowerCase().includes(word))) {
+            return gotoFlow(registerFlow);
         }
-        await flowDynamic('Gracias!')
-        return
-    },
-)
+        return await flowDynamic('Gracias!');
+        
+    }
+   )
 
-const flowToB = addKeyword<Provider, Database>('pedido').addAnswer( 
+const flowToB = addKeyword<Provider, Database>(['pedido', 'PEDIDO', 'Pedido'])
+.addAnswer( 
     ['Para ver el estado, indícanos los detalles de tu pedido.  \n', 
-    'Número de Pedido \n',
-    'Direccion de correo electrónico \n',
-    'Recibe promociones y actualizaciones especiales por correo electrónico.  *si* '].join(
-    '\n'
+    '*Número de Pedido* \n',
+    '*Nombre y Apellido* \n',
+    '*Direccion de correo electrónico* \n',
+    
+    'Indica la palaba *si*, para realizar el registro '].join(
+        '\n'
     ),
-    { capture: true },
-    async (ctx, { gotoFlow, flowDynamic }) => {
-        if (ctx.body.toLocaleLowerCase().includes('si')) {
-            return gotoFlow(registerFlow)
+    { delay: 200, capture: true },
+    
+    async (ctx, { gotoFlow, flowDynamic }) => {        
+        if (['si', 'Si', 'SI', 'S', 's'].some(word => ctx.body.toLowerCase().includes(word))) {
+            return gotoFlow(registerPEDIDO);
         }
-        await flowDynamic('Gracias!')
-        return
-    },
+        return await flowDynamic('Gracias!');
+        
+    }
 )
 
-const flowToC = addKeyword<Provider, Database>('envio').addAnswer( 
+const flowToC = addKeyword<Provider, Database>(['envio', 'ENVIO', 'Envio'])
+.addAnswer( 
     ['Todos los pedidos ingresados a la plataforma online, serán despachados en el orden de llegada de cada pedido. \n',
     'Cuando el pedido está preparado para su envío o retiro, le llegará un mensaje al correo con la confirmación.\n',
     'La entrega se hará aproximadamente de:\n',
@@ -49,54 +65,55 @@ const flowToC = addKeyword<Provider, Database>('envio').addAnswer(
     'En ocasiones se presentan novedades que nos impiden cumplir con nuestra promesa de entrega, sin embargo, queremos garantizarte que este tiempo no excederá un plazo máximo de 30 días.\n',
     '*Días hábiles se consideran de lunes a viernes.\n',
         
-    'Recibe promociones y actualizaciones especiales por correo electrónico.  *si* '].join(
-    '\n'
-    ),
-    { capture: true },
-    async (ctx, { gotoFlow, flowDynamic }) => {
-        if (ctx.body.toLocaleLowerCase().includes('si')) {
-            return gotoFlow(registerFlow)
-        }
-        await flowDynamic('Gracias!')
-        return
-    },
-)
-const flowToD = addKeyword<Provider, Database>('cambios').addAnswer( 
-    ['Para hacer un cambio tienes 2 opciones: Puede hacer el cambio GRATIS en cualquier Touché Store de Chile presentando la boleta de compra.    Envía el paquete a la dirección:   Alonso de Córdova 2843, Local A, Vitacura, A nombre de Comercializadora MS S.A (TOUCHE), Con una nota que diga "PEDIDO XXXX CAMBIO POR TALLA O POR PRODUCTO” Incluir el nombre de la tienda TOUCHE Santiago – Chile Teléfono: (+56) 222289500    Los cambios serán procesados dentro de los 15 días hábiles posteriores a la recepción del envío.\n',
-        
-    'Recibe promociones y actualizaciones especiales por correo electrónico.  *si* '].join(
-    '\n'
-    ),
-    { capture: true },
-    async (ctx, { gotoFlow, flowDynamic }) => {
-        if (ctx.body.toLocaleLowerCase().includes('si')) {
-            return gotoFlow(registerFlow)
-        }
-        await flowDynamic('Gracias!')
-        return
-    },
-)
-
-const flowDefault = addKeyword<Provider, Database>('').addAnswer("Envíanos un mensaje directo si tienes alguna pregunta. Nos complace ayudarte. No has indicado ninguna opción 🤔")
-
-/**
-        *
-const discordFlow = addKeyword<Provider, Database>('inf').addAnswer(
-    ['📄 Puedes escribirnos de lunes a viernes de 9:00 a. m. a 6:00 p. m. por este chat de la tienda, por correo electrónico a soporteonline@touchechile.cl y WhatsApp al +56 22289500. Los casos del fin de semana y festivos se atenderán a partir del siguiente día hábil en orden de llegada. \n', 
-    'Regístrate para recibir las últimas noticias y actualización de catalogos \n',
-    'Recibe promociones y actualizaciones especiales por correo electrónico. Puedes darte de baja en cualquier momento. *si* '].join(
+    'Recibe promociones y actualizaciones especiales por correo electrónico.  indica la palabra *si*, para realizar el registro ']
+    .join(
         '\n'
     ),
-    { capture: true },
+    { delay: 200, capture: true },
+    
     async (ctx, { gotoFlow, flowDynamic }) => {
-        if (ctx.body.toLocaleLowerCase().includes('si')) {
-            return gotoFlow(registerFlow)
+        if (['si', 'Si', 'SI', 'S', 's'].some(word => ctx.body.toLowerCase().includes(word))) {
+            return gotoFlow(registerFlow);
         }
-        await flowDynamic('Gracias!')
-        return
-    },
+        return await flowDynamic('Gracias!');
+        
+    }   
 )
- */
+
+const flowToD = addKeyword<Provider, Database>(['cambios', 'CAMBIOS', 'Cambios']).addAnswer( 
+    ['Para hacer un cambio tienes 2 opciones: Puede hacer el cambio GRATIS en cualquier Touché Store de Chile presentando la boleta de compra.    Envía el paquete a la dirección:   Alonso de Córdova 2843, Local A, Vitacura, A nombre de Comercializadora MS S.A (TOUCHE), Con una nota que diga "PEDIDO XXXX CAMBIO POR TALLA O POR PRODUCTO” Incluir el nombre de la tienda TOUCHE Santiago – Chile Teléfono: (+56) 222289500    Los cambios serán procesados dentro de los 15 días hábiles posteriores a la recepción del envío.\n',
+        
+    'Recibe promociones y actualizaciones especiales por correo electrónico.  indica la palabra *si*, para realizar el registro '].join(
+        '\n'
+    ),
+    { delay: 300, capture: true },
+    
+    async (ctx, { gotoFlow, flowDynamic }) => {
+        if (['si', 'Si', 'SI', 'S', 's'].some(word => ctx.body.toLowerCase().includes(word))) {
+            return gotoFlow(registerFlow);
+        }
+        return await flowDynamic('Gracias!');
+        
+    }
+)
+
+const flowToE = addKeyword<Provider, Database>(['rey', 'REY', 'MIJU', 'miju', 'Miju', 'cuenteme', 'CUENTEME']).addAnswer( 
+    ['Mensaje automatico de bot de whatsapp. actualmente en contrucción\n',
+    'Hello, world!, soy nivel A1, esto el nuevo GunBound\n',    
+    'Recibe promociones y actualizaciones especiales por correo electrónico.  indica la palabra *si*, para realizar el registro '].join(
+        '\n'
+    ),
+    { delay: 300, capture: true },
+    
+    async (ctx, { gotoFlow, flowDynamic }) => {
+        if (['si', 'Si', 'SI', 'S', 's'].some(word => ctx.body.toLowerCase().includes(word))) {
+            return gotoFlow(registerFlow);
+        }
+        return await flowDynamic('Gracias!');
+        
+    }
+)
+
 
 const welcomeFlow = addKeyword<Provider, Database>(['hi', 'hello', 'hola','Hola', 'HOLA', 'BUENAS', 'Buenas', 'buenas'])
     .addAnswer(`🙌 Hola, Bienvenido *touchechile.cl*`)
@@ -114,55 +131,59 @@ const welcomeFlow = addKeyword<Provider, Database>(['hi', 'hello', 'hola','Hola'
              '  👉🏻 escribe *cambios* para ver información',
         ].join('\n'),
 
-        { delay: 800, capture: true },
-        /**
-        * 
-        async (ctx, { fallBack }) => {
-            if (!ctx.body.toLocaleLowerCase().includes('inf')) {
-                return fallBack('Deberías escribir *inf*, *pedido*, *envio*, *cambios*')            
-            }
-            if (!ctx.body.toLocaleLowerCase().includes('pedido')) {
-                return fallBack('Deberías escribir *inf*, *pedido*, *envio*, *cambios*')            
-            }
-            if (!ctx.body.toLocaleLowerCase().includes('envio')) {
-                return fallBack('Deberías escribir *inf*, *pedido*, *envio*, *cambios*')            
-            }
-            if (!ctx.body.toLocaleLowerCase().includes('cambios')) {
-                return fallBack('Deberías escribir *inf*, *pedido*, *envio*, *cambios*')            
-            }
-            return             
-        },
-        
-        [discordFlow]
-         */        
+        { delay: 300, capture: true },
+       
+        async (ctx, { fallBack, flowDynamic }) => {                   
+            if (!['inf', 'INF', 'Inf','pedido', 'PEDIDO', 'Pedido', 'envio', 'ENVIO', 'Envio', 'cambios', 'CAMBIOS', 'Cambios'].some(word => ctx.body.toLowerCase().includes(word))) {
+                return fallBack('Deberías escribir *inf*, *pedido*, *envio*, *cambios*');
+              }
+            return await flowDynamic('Gracias!');                    
+        },      
     )
-    
-    .addAnswer(`Gracias por la respuesta `, async (ctx, { gotoFlow }) => {
-        const userAnswer = ctx.body
-        if(userAnswer === 'inf'){
-            return gotoFlow(flowToA)
+    .addAction(async (ctx, { gotoFlow, flowDynamic }) => {
+        if (['inf', 'INF', 'Inf'].some(word => ctx.body.toLowerCase().includes(word))) {        
+            return gotoFlow(flowToA);
         } 
-        if(userAnswer === 'pedido'){
-            return gotoFlow(flowToB)
+        if (['pedido', 'PEDIDO', 'Pedido'].some(word => ctx.body.toLowerCase().includes(word))) { 
+            return gotoFlow(flowToB);
         } 
-        if(userAnswer === 'envio'){
-            return gotoFlow(flowToC)
+        if (['envio', 'ENVIO', 'Envio'].some(word => ctx.body.toLowerCase().includes(word))) { 
+            return gotoFlow(flowToC);
         } 
-        if(userAnswer === 'cambios'){
-            return gotoFlow(flowToD)
-        } 
-        return gotoFlow(flowDefault)
-    })
+        if (['cambios', 'CAMBIOS', 'Cambios'].some(word => ctx.body.toLowerCase().includes(word))) {
+            return gotoFlow(flowToD);
+        }
+        if (['rey', 'REY', 'MIJU', 'miju', 'Miju', 'cuenteme', 'CUENTEME'].some(word => ctx.body.toLowerCase().includes(word))) {
+            return gotoFlow(flowToE);
+        }
+        await flowDynamic('Gracias!');
 
-const registerFlow = addKeyword<Provider, Database>(utils.setEvent('REGISTER_FLOW'))
-    .addAnswer(`Indicanos nombre`, { capture: true }, async (ctx, { state }) => {
-        await state.update({ name: ctx.body })
+        return gotoFlow(flowDefault);
     })
-    .addAnswer('Indicanos correo electronico', { capture: true }, async (ctx, { state }) => {
-        await state.update({ correo: ctx.body })
+    
+const registerFlow = addKeyword<Provider, Database>(utils.setEvent('REGISTER_FLOW'))
+    .addAnswer(`Indicanos un Nombre y Apellido para el registro`, { capture: true }, async (ctx, { state }) => {
+        await state.update({ name: ctx.body });
+    })
+    .addAnswer('Indicanos un correo electronico', { capture: true }, async (ctx, { state }) => {
+        await state.update({ correo: ctx.body });
     })
     .addAction(async (_, { flowDynamic, state }) => {
-        await flowDynamic(`${state.get('name')}, Gracias!: correo: ${state.get('correo')}`)
+        await flowDynamic(`${state.get('name')}, Gracias!: correo: ${state.get('correo')}`);
+    })
+
+const registerPEDIDO = addKeyword<Provider, Database>(utils.setEvent('REGISTER_FLOW'))
+    .addAnswer('Indicanos el número de pedido', { capture: true }, async (ctx, { state }) => {
+        await state.update({ pedido: ctx.body });
+    })
+    .addAnswer(`Indicanos un Nombre y Apellido para el registro`, { capture: true }, async (ctx, { state }) => {
+        await state.update({ name: ctx.body });
+    })
+    .addAnswer('Indicanos un correo electronico', { capture: true }, async (ctx, { state }) => {
+        await state.update({ correo: ctx.body });
+    })
+    .addAction(async (_, { flowDynamic, state }) => {
+        await flowDynamic(`${state.get('name')}, Gracias!: número de pedido: ${state.get('pedido')} correo: ${state.get('correo')}`);
     })
 
 const fullSamplesFlow = addKeyword<Provider, Database>(['samples', utils.setEvent('SAMPLES')])
@@ -177,7 +198,7 @@ const fullSamplesFlow = addKeyword<Provider, Database>(['samples', utils.setEven
     })
 
 const main = async () => {
-    const adapterFlow = createFlow([welcomeFlow, registerFlow, fullSamplesFlow])
+    const adapterFlow = createFlow([welcomeFlow, registerFlow, registerPEDIDO, fullSamplesFlow, flowDefault, flowToA, flowToB, flowToC, flowToD, flowToE])
     
     const adapterProvider = createProvider(Provider)
     const adapterDB = new Database()
