@@ -97,7 +97,7 @@ const flowToD = addKeyword<Provider, Database>(['cambios', 'CAMBIOS', 'Cambios']
     }
 )
 
-const flowToE = addKeyword<Provider, Database>(['rey', 'REY', 'MIJU', 'miju', 'Miju', 'cuenteme', 'CUENTEME']).addAnswer( 
+const flowToE = addKeyword<Provider, Database>(['rey', 'REY', 'MIJU', 'miju', 'Miju', 'cuenteme', 'CUENTEME', 'papi', 'PAPI', 'ñeco', 'ÑECO']).addAnswer( 
     ['Mensaje automatico de bot de whatsapp. actualmente en contrucción\n',
     'Hello, world!, soy nivel A1, esto el nuevo GunBound\n',    
     'Recibe promociones y actualizaciones especiales por correo electrónico.  indica la palabra *si*, para realizar el registro '].join(
